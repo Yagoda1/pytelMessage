@@ -20,8 +20,16 @@ messages = [
     "יש פה אנשים בכלל?"
 ]
 
+# Set to keep track of users who have received the predefined message
+users_sent_message = set()
+
 # Predefined response message for private messages
-predefined_message = "דבר איתי פה: https://t.me/PassionVideoBot"
+predefined_message = (
+    "ברוכים הבאים לPassionVideo, המקום שבו אנו מספקות את השירות האיכותי ביותר לשיחות וידאו ושירותים למבוגרים (ללא מפגשים) 🌟\n"
+    "אנחנו משקיעות את מיטב המאמצים במרחב האינטימי הזה, כדי להבטיח שתוכל להנות מאינספור חוויות יחודיות עם מקסימום בטיחות ודיסקרטיות 🔒\n"
+    "לרגל ההשקה אתם מקבלים שיחת אימות וידאו ראשונה בחינם! מוזמנים לבחור ממגוון הדוגמניות שלנו שרק דגל לשיחות וידאו מהנות ;)\n"
+    "דבר איתי פה: https://t.me/PassionVideoBot יש שיחת אימות חינם"
+)
 
 # Create the client and connect
 client = TelegramClient('session_name', api_id, api_hash)
@@ -40,7 +48,7 @@ async def send_messages():
         for group_id in group_ids:
             message = random.choice(messages)
             try:
-                await client.send_message(group_id, message)
+                #await client.send_message(group_id, message)
                 print(f"Sent message to group {group_id}: {message}")
             except errors.FloodWaitError as e:
                 print(f"Sleeping for {e.seconds} seconds due to flood wait")
@@ -53,8 +61,11 @@ async def send_messages():
 @client.on(events.NewMessage(incoming=True))
 async def handle_new_message(event):
     if event.is_private:  # Only respond to private messages
-        await event.respond(predefined_message)
-        print(f"Responded to {event.sender_id}")
+
+       if event.sender_id not in users_sent_message:
+            await event.respond(predefined_message)
+            users_sent_message.add(event.sender_id)
+            print(f"Responded to {event.sender_id} and added to users_sent_message")
 
 async def main():
     await client.start(phone_number)
