@@ -48,8 +48,9 @@ async def send_messages():
         for group_id in group_ids:
             message = random.choice(messages)
             try:
-                #await client.send_message(group_id, message)
+                await client.send_message(group_id, message)
                 print(f"Sent message to group {group_id}: {message}")
+                await asyncio.sleep(20)
             except errors.FloodWaitError as e:
                 print(f"Sleeping for {e.seconds} seconds due to flood wait")
                 await asyncio.sleep(e.seconds)
